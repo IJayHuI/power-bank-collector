@@ -15,7 +15,7 @@ struct DeviceView: View {
                     .imageScale(.large)
                     .foregroundStyle(.tint)
                 Text("设备")
-                Text("HHHHHHHHH")
+                Text("HHHHH")
             }
             .navigationTitle("设备")
         }
