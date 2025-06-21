@@ -61,7 +61,7 @@ struct DeviceView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        print("111")
+                        print("1111")
                     }) {
                         Image(systemName: "ellipsis")
                             .rotationEffect(.degrees(180))
