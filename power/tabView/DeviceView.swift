@@ -9,14 +9,16 @@ import SwiftUI
 
 // MARK: 设备主视图
 struct DeviceView: View {
-    @State private var devices: [Device] = []
+    @State private var devices: [DeviceViewDevice] = []
     @State private var loadingStatus = false
     @State private var errorMessage: String?
+    @Namespace private var animationNamespace
+    
     
     // 定义两列网格布局
     private let columns = [
-        GridItem(.flexible(),spacing: 18),
-        GridItem(.flexible(),spacing: 18)
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
     ]
     
     var body: some View {
@@ -27,9 +29,9 @@ struct DeviceView: View {
                 Text("错误：\(error)")
             } else {
                 ScrollView {
-                    LazyVGrid(columns: columns) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(devices) { item in
-                            NavigationLink(destination: InformationView(device: item)) {
+                            NavigationLink(destination: InformationView(inputDevice: item)) {
                                 DeviceCard(device: item)
                             }
                         }
@@ -52,7 +54,7 @@ struct DeviceView: View {
         errorMessage = nil
         Task {
             do {
-                let response: DataListResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors?populate=*", responseType: DataListResponse.self)
+                let response: DeviceViewResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors?populate=*", responseType: DeviceViewResponse.self)
                 await MainActor.run {
                     self.devices = response.data
                 }
@@ -68,67 +70,76 @@ struct DeviceView: View {
 
 //MARK: 设备卡片组件
 struct DeviceCard: View {
-    let device: Device
+    let device: DeviceViewDevice
     var body: some View {
-        VStack {
-            if let firstImage = device.image?.first,let url = URL(string: "https://strapi.jayhu.site" + (firstImage.formats.medium.url)) {
+        VStack(spacing: 0) {
+            if let firstImage = device.thumbnail,let url = URL(string: "https://strapi.jayhu.site" + (firstImage.formats.medium.url)) {
                 AsyncImage(url: url) { phase in
-                    if let image = phase.image {
-                        image.resizable()
-                            .scaledToFit()
-                    } else if phase.error != nil {
+                    switch phase {
+                    case .empty:
                         Image(systemName: "iphone")
                             .font(.system(size: 40))
                             .foregroundColor(.blue)
-                        
-                    } else {
-                        ProgressView()
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .clipped()
+                    case .failure(_):
+                        Image(systemName: "xmark")
+                            .font(.system(size: 40))
+                            .foregroundColor(.blue)
+                    @unknown default:
+                        Image(systemName: "iphone")
+                            .font(.system(size: 40))
+                            .foregroundColor(.blue)
                     }
                 }
-                .frame(height: 120)
-                .frame(maxWidth: .infinity)
             } else {
                 Image(systemName: "iphone")
                     .font(.system(size: 40))
                     .foregroundColor(.blue)
-                    .frame(height: 120)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
             }
             Text(device.name)
                 .font(.headline)
                 .lineLimit(2)
                 .padding()
+                .foregroundStyle(Color.primary)
         }
-        .background(Color(.systemBackground))
         .cornerRadius(25)
-        .shadow(radius: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: 25)
+                .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+        )
     }
 }
 
 // MARK: 设备相关模型
-struct DataListResponse: Codable {
-    let data: [Device]
+struct DeviceViewResponse: Codable {
+    let data: [DeviceViewDevice]
 }
 
-struct Device: Codable, Identifiable {
+struct DeviceViewDevice: Codable, Identifiable {
     let id: Int
     let documentId: String
     let name: String
-    let image: [DeviceImage]?
+    let thumbnail: DeviceViewThumbnail?
 }
 
-struct DeviceImage: Codable {
+struct DeviceViewThumbnail: Codable {
     let id: Int
     let documentId: String
     let name: String
-    let formats: Formats
+    let formats: DeviceViewFormats
 }
 
-struct Formats: Codable {
-    let medium: Medium
+struct DeviceViewFormats: Codable {
+    let medium: DeviceViewMedium
 }
 
-struct Medium: Codable {
+struct DeviceViewMedium: Codable {
     let url: String
 }
 
