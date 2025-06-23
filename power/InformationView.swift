@@ -8,18 +8,75 @@
 import SwiftUI
 
 struct InformationView: View {
-    let device: Device
+    let inputDevice: DeviceViewDevice
+    @State private var device: InformationViewDevice? = nil
+    @State private var loadingStatus = false
+    @State private var errorMessage: String? = nil
     
     var body: some View {
-        VStack {
-            Text("设备详情")
-                .font(.largeTitle)
-                .padding()
-            Text("名称：\(device.name)")
-                .font(.title2)
-                .padding()
-            // 可根据需要添加更多设备信息展示
+        ScrollView {
+            InformationBanner(inputDevice: device)
+            InfomationContent(inputDevice: device)
         }
-        .navigationTitle("详情")
+        .ignoresSafeArea()
+        .onAppear {
+            Task { await getData() }
+        }
     }
+    
+    private func getData() async {
+        loadingStatus = true
+        errorMessage = nil
+        Task {
+            do {
+                let response: InformationViewResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors/\(inputDevice.documentId)?populate=*", responseType: InformationViewResponse.self)
+                await MainActor.run {
+                    self.device = response.data
+                }
+                print("结果",response.data)
+                self.loadingStatus = false
+            } catch {
+                print("请求失败：", error.localizedDescription)
+                self.loadingStatus = false
+            }
+        }
+    }
+    
+}
+
+struct InformationViewResponse: Codable {
+    let data: InformationViewDevice
+}
+
+struct InformationViewDevice: Codable, Identifiable {
+    let id: Int
+    let documentId: String
+    let name: String
+    let createdAt: String
+    let updatedAt: String
+    let publishedAt: String
+    let model: String
+    let brand: String
+    let type: [String]
+    let size: String
+    let weight: Double
+    let input: [String]
+    let output: [String]
+    let wireless: [String]
+    let capacity: String
+    let group: String
+    let image: [InformationViewImage]?
+}
+
+struct InformationViewImage: Codable, Identifiable {
+    let id: Int
+    let documentId: String
+    let name: String
+    let width: Int
+    let height: Int
+    let url: String
+}
+
+#Preview {
+    DeviceView()
 }
