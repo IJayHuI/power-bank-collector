@@ -28,19 +28,38 @@ let categoryData: [FileItem] = [
     FileItem(name: "品牌", children:
                 [FileItem(name: "Anker", children: nil),
                  FileItem(name: "Apple", children: nil),
-                 FileItem(name: "Belkin", children: nil)
-                ]),
-    FileItem(name: "功率", children:
-                [FileItem(name: "private", children: nil),
-                 FileItem(name: "private", children: nil)
+                 FileItem(name: "Belkin", children: nil),
+                 FileItem(name: "CUKTECH", children: nil),
+                 FileItem(name: "倍思", children: nil),
+                 FileItem(name: "制糖工厂", children: nil),
+                 FileItem(name: "小米", children: nil),
+                 FileItem(name: "绿联", children: nil),
+                 FileItem(name: "罗马仕", children: nil),
+                 FileItem(name: "闪极", children: nil)
                 ]),
     FileItem(name: "协议", children:
-                [FileItem(name: "private", children: nil),
-                 FileItem(name: "private", children: nil)
+                [FileItem(name: "Apple", children: nil),
+                 FileItem(name: "FCP", children: nil),
+                 FileItem(name: "Mipps", children: nil),
+                 FileItem(name: "PD", children: nil),
+                 FileItem(name: "PPS", children: nil),
+                 FileItem(name: "QC", children: nil),
+                 FileItem(name: "SCP", children: nil),
+                 FileItem(name: "UFCS", children: nil)
+                ]),
+    FileItem(name: "功率", children:
+                [FileItem(name: "5W以上", children: nil),
+                 FileItem(name: "10W以上", children: nil),
+                 FileItem(name: "20W以上", children: nil),
+                 FileItem(name: "30W以上", children: nil),
+                 FileItem(name: "40W以上", children: nil),
+                 FileItem(name: "60W以上", children: nil),
+                 FileItem(name: "100W以上", children: nil)
                 ]),
     FileItem(name: "类型", children:
-                [FileItem(name: "private", children: nil),
-                 FileItem(name: "private", children: nil)
+                [FileItem(name: "充电器", children: nil),
+                 FileItem(name: "充电宝", children: nil),
+                 FileItem(name: "其他", children: nil)
                 ])
 ]
 
