@@ -19,6 +19,7 @@ struct InformationView: View {
             InfomationContent(inputDevice: device)
         }
         .ignoresSafeArea()
+        .toolbar(.hidden, for: .tabBar)
         .onAppear {
             Task { await getData() }
         }
@@ -30,10 +31,10 @@ struct InformationView: View {
         Task {
             do {
                 let response: InformationViewResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors/\(inputDevice.documentId)?populate=*", responseType: InformationViewResponse.self)
+                print("详情页请求数据", response.data)
                 await MainActor.run {
                     self.device = response.data
                 }
-                print("结果",response.data)
                 self.loadingStatus = false
             } catch {
                 print("请求失败：", error.localizedDescription)
