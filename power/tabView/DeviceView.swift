@@ -73,7 +73,7 @@ struct DeviceCard: View {
     let device: DeviceViewDevice
     var body: some View {
         VStack(spacing: 0) {
-            if let firstImage = device.thumbnail,let url = URL(string: "https://strapi.jayhu.site" + (firstImage.formats.medium.url)) {
+            if let firstImage = device.thumbnail,let url = URL(string: "https://strapi.jayhu.site" + (firstImage.formats.small.url)) {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .empty:
@@ -136,10 +136,10 @@ struct DeviceViewThumbnail: Codable {
 }
 
 struct DeviceViewFormats: Codable {
-    let medium: DeviceViewMedium
+    let small: DeviceViewSmall
 }
 
-struct DeviceViewMedium: Codable {
+struct DeviceViewSmall: Codable {
     let url: String
 }
 
