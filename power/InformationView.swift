@@ -67,6 +67,30 @@ struct InformationViewDevice: Codable, Identifiable {
     let capacity: String
     let group: String
     let image: [InformationViewImage]?
+    
+    // 设置默认值
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+
+            id = try container.decode(Int.self, forKey: .id)
+            documentId = try container.decodeIfPresent(String.self, forKey: .documentId) ?? ""
+            name = try container.decodeIfPresent(String.self, forKey: .name) ?? "暂无"
+            createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt) ?? "暂无"
+            updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt) ?? "暂无"
+            publishedAt = try container.decodeIfPresent(String.self, forKey: .publishedAt) ?? ""
+            model = try container.decodeIfPresent(String.self, forKey: .model) ?? "暂无"
+            brand = try container.decodeIfPresent(String.self, forKey: .brand) ?? "暂无"
+            type = try container.decodeIfPresent([String].self, forKey: .type) ?? []
+            size = try container.decodeIfPresent(String.self, forKey: .size) ?? "暂无"
+            weight = try container.decodeIfPresent(Double.self, forKey: .weight) ?? 0
+            input = try container.decodeIfPresent([String].self, forKey: .input) ?? []
+            output = try container.decodeIfPresent([String].self, forKey: .output) ?? []
+            wireless = try container.decodeIfPresent([String].self, forKey: .wireless) ?? []
+            capacity = try container.decodeIfPresent(String.self, forKey: .capacity) ?? "暂无"
+            group = try container.decodeIfPresent(String.self, forKey: .group) ?? "暂无"
+            image = try container.decodeIfPresent([InformationViewImage].self, forKey: .image)
+        }
+
 }
 
 struct InformationViewImage: Codable, Identifiable {

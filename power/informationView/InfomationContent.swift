@@ -88,13 +88,14 @@ struct InfomationContent: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                VStack{
-                    if let param = inputDevice?.weight,!param.isNaN {
+                VStack {
+                    if let weight = inputDevice?.weight, !weight.isNaN {
                         Text("重量")
                             .font(.title2)
                             .bold()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("\(param)")
+
+                        Text(weight == 0 ? "暂无" : "\(String(format: "%.2f", weight)) 克")
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
