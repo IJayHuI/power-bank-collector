@@ -21,13 +21,27 @@ struct SettingView: View {
                 .padding(.horizontal)
 
                 // 封面区域
+                // 顶部数据统计卡片
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(height: 150)
+                    .fill(Color.gray.opacity(0.1))
+                    .frame(height: 130)
+                    .overlay(
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("概览")
+                                .font(.headline)
+
+                            HStack(spacing: 20) {
+                                statBox(icon: "checkmark.seal.fill", title: "已拥有", count: 3, color: .green)
+                                statBox(icon: "star.fill", title: "愿望", count: 3, color: .orange)
+                                statBox(icon: "wrench.and.screwdriver.fill", title: "需维护", count: 3, color: .red)
+                            }
+                        }
+                        .padding()
+                    )
                     .padding(.horizontal)
 
                 // 四个跳转按钮
-                VStack(spacing: 14) {
+                VStack(spacing: 10) {
                     NavigationLink(destination: MaintenanceView()) {
                         settingButton(title: "维护", icon: "wrench.and.screwdriver")
                     }
@@ -50,7 +64,6 @@ struct SettingView: View {
         }
     }
 
-    // ✅ 美化后的按钮样式
     func settingButton(title: String, icon: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -72,6 +85,23 @@ struct SettingView: View {
                 .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
         )
     }
+}
+
+func statBox(icon: String, title: String, count: Int, color: Color) -> some View {
+    VStack(spacing: 8) {
+        Image(systemName: icon)
+            .font(.system(size: 20))
+            .foregroundColor(color)
+
+        Text("\(count)")
+            .font(.title2)
+            .bold()
+
+        Text(title)
+            .font(.caption)
+            .foregroundColor(.gray)
+    }
+    .frame(maxWidth: .infinity)
 }
 
 #Preview {
