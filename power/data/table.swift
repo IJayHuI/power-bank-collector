@@ -17,7 +17,7 @@ class LocalDatabase {
     
     let id = Expression<Int64>("id")
     let itemid = Expression<Int>("itemid")
-    let documentId = Expression<String>("documentId")  // 大写I
+    let documentId = Expression<String>("documentId")
     let date = Expression<String>("date")
     let powerstatus = Expression<Int>("powerstatus")
     let powerdate = Expression<String>("powerdate")
@@ -52,7 +52,7 @@ class LocalDatabase {
         try db?.run(items.create(ifNotExists: true) { t in
             t.column(id, primaryKey: .autoincrement)
             t.column(itemid)
-            t.column(documentId)   // 这里也用大写I
+            t.column(documentId)
             t.column(date)
             t.column(powerstatus)
             t.column(powerdate)
@@ -69,12 +69,12 @@ class LocalDatabase {
         
         let insert = items.insert(
             itemid <- deviceId,
-            self.documentId <- documentId,  // 这里是 self.documentId ，和上面声明变量一致
+            self.documentId <- documentId, 
             date <- dateStr,
             powerstatus <- status,
             powerdate <- powerDate,
             image <- imageUrl,
-            self.name <- name   // 这里不是 self.name ，是 name
+            self.name <- name
         )
         
         try db.run(insert)
@@ -95,7 +95,7 @@ class LocalDatabase {
                 powerdate: row[powerdate],
                 image: row[image],
                 name: row[name],
-                documentId: row[documentId]  // 大写I
+                documentId: row[documentId]
             )
             result.append(item)
         }
