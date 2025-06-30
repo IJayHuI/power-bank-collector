@@ -5,14 +5,6 @@
 //  Created by 胡杰 on 2025/6/18.
 //
 
-
-//
-//  ContentView.swift
-//  power
-//
-//  Created by 胡杰 on 2025/6/18.
-//
-
 import SwiftUI
 
 

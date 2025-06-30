@@ -10,6 +10,8 @@ import SwiftUI
 struct InfomationContent: View {
     let inputDevice: InformationViewDevice?
     @State private var showModal = false
+    @State private var showAddSheet = false
+    
     var body: some View {
         VStack(spacing: 15){
             VStack{

@@ -71,48 +71,74 @@ struct DeviceView: View {
 //MARK: 设备卡片组件
 struct DeviceCard: View {
     let device: DeviceViewDevice
+
     var body: some View {
         VStack(spacing: 0) {
-            if let firstImage = device.thumbnail,let url = URL(string: "https://strapi.jayhu.site" + (firstImage.formats.small.url)) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        Image(systemName: "iphone")
-                            .font(.system(size: 40))
-                            .foregroundColor(.blue)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .clipped()
-                    case .failure(_):
-                        Image(systemName: "xmark")
-                            .font(.system(size: 40))
-                            .foregroundColor(.blue)
-                    @unknown default:
-                        Image(systemName: "iphone")
-                            .font(.system(size: 40))
-                            .foregroundColor(.blue)
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.gray.opacity(0.05))
+
+                if let firstImage = device.thumbnail,
+                   let url = URL(string: "https://strapi.jayhu.site" + firstImage.formats.small.url) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            placeholderImage
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .clipped()
+                        case .failure(_):
+                            errorImage
+                        @unknown default:
+                            placeholderImage
+                        }
                     }
+                } else {
+                    placeholderImage
                 }
-            } else {
-                Image(systemName: "iphone")
-                    .font(.system(size: 40))
-                    .foregroundColor(.blue)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
             }
+            .frame(height: 140)
+            .clipped()
+            .cornerRadius(20)
+
             Text(device.name)
                 .font(.headline)
                 .lineLimit(2)
-                .padding()
-                .foregroundStyle(Color.primary)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.primary)
+                .padding([.top, .horizontal], 8)
+                .padding(.bottom, 12)
         }
+        .background(Color.white)
         .cornerRadius(25)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         .overlay(
             RoundedRectangle(cornerRadius: 25)
-                .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
         )
+    }
+
+    private var placeholderImage: some View {
+        Image(systemName: "iphone")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 50, height: 50)
+            .foregroundColor(.blue.opacity(0.6))
+    }
+
+    private var errorImage: some View {
+        VStack {
+            Image(systemName: "xmark.circle")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
+                .foregroundColor(.red)
+            Text("加载失败")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
     }
 }
 

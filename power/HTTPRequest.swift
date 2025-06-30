@@ -229,3 +229,23 @@ struct APIResponse<T: Codable>: Codable {
 }
 
 struct EmptyResponse: Codable {}
+
+
+extension HTTPRequest {
+    func getRawData(endpoint: String) async throws -> Data {
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw HTTPRequestError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.GET.rawValue
+
+        let (data, response) = try await session.data(for: request)
+
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw HTTPRequestError.serverError(httpResponse.statusCode)
+        }
+
+        return data
+    }
+}
