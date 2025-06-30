@@ -15,5 +15,5 @@ struct OwnedItem: Identifiable {
     let powerdate: String
     let image: String
     let name: String
-    let documentid: String
+    let documentId: String
 }

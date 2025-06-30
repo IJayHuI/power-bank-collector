@@ -17,7 +17,7 @@ class LocalDatabase {
     
     let id = Expression<Int64>("id")
     let itemid = Expression<Int>("itemid")
-    let documentid = Expression<String>("documentid")
+    let documentId = Expression<String>("documentId")  // 大写I
     let date = Expression<String>("date")
     let powerstatus = Expression<Int>("powerstatus")
     let powerdate = Expression<String>("powerdate")
@@ -52,7 +52,7 @@ class LocalDatabase {
         try db?.run(items.create(ifNotExists: true) { t in
             t.column(id, primaryKey: .autoincrement)
             t.column(itemid)
-            t.column(documentid)
+            t.column(documentId)   // 这里也用大写I
             t.column(date)
             t.column(powerstatus)
             t.column(powerdate)
@@ -69,12 +69,12 @@ class LocalDatabase {
         
         let insert = items.insert(
             itemid <- deviceId,
-            documentid <- documentId,
+            self.documentId <- documentId,  // 这里是 self.documentId ，和上面声明变量一致
             date <- dateStr,
             powerstatus <- status,
             powerdate <- powerDate,
             image <- imageUrl,
-            self.name <- name
+            self.name <- name   // 这里不是 self.name ，是 name
         )
         
         try db.run(insert)
@@ -95,7 +95,28 @@ class LocalDatabase {
                 powerdate: row[powerdate],
                 image: row[image],
                 name: row[name],
-                documentid: row[documentid]  // 放最后
+                documentId: row[documentId]  // 大写I
+            )
+            result.append(item)
+        }
+        return result
+    }
+    func fetchWishItems() throws -> [OwnedItem] {
+        guard let db = db else {
+            throw NSError(domain: "数据库未初始化", code: 0)
+        }
+        var result: [OwnedItem] = []
+        let query = items.filter(powerstatus == 2)  // powerstatus == 2 代表愿望状态
+        for row in try db.prepare(query) {
+            let item = OwnedItem(
+                id: row[id],
+                itemid: row[itemid],
+                date: row[date],
+                powerstatus: row[powerstatus],
+                powerdate: row[powerdate],
+                image: row[image],
+                name: row[name],
+                documentId: row[documentId]
             )
             result.append(item)
         }

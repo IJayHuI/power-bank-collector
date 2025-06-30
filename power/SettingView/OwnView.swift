@@ -27,60 +27,10 @@ struct OwnView: View {
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(ownedItems) { item in
-                                NavigationLink(destination: InformationView(inputDevice: DeviceViewDevice(
-                                    id: item.itemid,
-                                    documentId: "", // 本地没有 documentId，传空字符串
-                                    name: item.name,
-                                    thumbnail: DeviceViewThumbnail(
-                                        id: 0,
-                                        documentId: "",
-                                        name: "",
-                                        formats: DeviceViewFormats(
-                                            small: DeviceViewSmall(url: item.image)
-                                        )
-                                    )
-                                ))) {
-                                    HStack {
-                                        if let url = URL(string: "https://strapi.jayhu.site" + item.image) {
-                                            AsyncImage(url: url) { phase in
-                                                switch phase {
-                                                case .empty:
-                                                    ProgressView()
-                                                case .success(let image):
-                                                    image.resizable()
-                                                        .scaledToFill()
-                                                case .failure(_):
-                                                    Image(systemName: "photo")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                @unknown default:
-                                                    EmptyView()
-                                                }
-                                            }
-                                            .frame(width: 60, height: 60)
-                                            .cornerRadius(8)
-                                        } else {
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .fill(Color.gray.opacity(0.3))
-                                                .frame(width: 60, height: 60)
-                                        }
-
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(item.name)
-                                                .font(.headline)
-                                            Text("已拥有 - 添加日期: \(item.date)")
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding()
-                                    .background(Color.gray.opacity(0.1))
-                                    .cornerRadius(12)
-                                    .padding(.horizontal)
-                                }
+                                OwnItemRow(item: item)
                             }
                         }
+                        .padding(.top, 8)
                     }
                 }
             }
@@ -109,6 +59,63 @@ struct OwnView: View {
                     self.isLoading = false
                 }
             }
+        }
+    }
+}
+
+struct OwnItemRow: View {
+    let item: OwnedItem
+
+    var body: some View {
+        NavigationLink(destination: InformationView(inputDevice: DeviceViewDevice(
+            id: Int(item.itemid),
+            documentId: item.documentId,
+            name: item.name,
+            thumbnail: nil
+        ))) {
+            HStack {
+                deviceImage
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(8)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.name)
+                        .font(.headline)
+                    Text("已拥有 - 添加日期: \(item.date)")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+            }
+            .padding()
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(12)
+            .padding(.horizontal)
+        }
+    }
+
+    private var deviceImage: some View {
+        if let url = URL(string: "https://strapi.jayhu.site" + item.image) {
+            return AnyView(
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image.resizable().scaledToFill()
+                    case .failure:
+                        Image(systemName: "photo")
+                            .resizable().scaledToFit()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            )
+        } else {
+            return AnyView(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.gray.opacity(0.3))
+            )
         }
     }
 }
