@@ -18,9 +18,7 @@ struct InformationView: View {
     @State private var loadingStatus = false
     @State private var errorMessage: String? = nil
     @State private var addSheetType: AddSheetType? = nil
-    
-    @State private var showAddSheet = false
-    @State private var selectedAddType: String = ""
+    @State private var isOwned = false
     
     var body: some View {
         NavigationStack {
@@ -47,6 +45,14 @@ struct InformationView: View {
                             Label("愿望", systemImage: "plus")
                         }
 
+                        if isOwned {
+                            Button {
+                                addSheetType = AddSheetType(value: "维护")
+                            } label: {
+                                Label("维护", systemImage: "wrench.adjustable")
+                            }
+                        }
+
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 18, weight: .medium))
@@ -55,7 +61,11 @@ struct InformationView: View {
                 }
             }
             .sheet(item: $addSheetType) { sheetType in
-                AddItemSheetView1(device: device, type: sheetType.value)
+                AddItemSheetView1(
+                    device: device,
+                    type: sheetType.value,
+                    showMaintenanceTime: sheetType.value == "拥有" || sheetType.value == "维护"
+                )
             }
             .navigationTitle(device?.name ?? "设备详情")
             .navigationBarTitleDisplayMode(.inline)
@@ -72,18 +82,31 @@ struct InformationView: View {
             do {
                 let data = try await HTTPRequest.shared.getRawData(endpoint: "/power-collectors/\(inputDevice.documentId)?populate=*")
                 if let jsonStr = String(data: data, encoding: .utf8) {
-                    print("接口返回 JSON:\n\(jsonStr)")
+                    print("JSON:\n\(jsonStr)")
                 }
-                
+
                 let response = try JSONDecoder().decode(InformationViewResponse.self, from: data)
                 await MainActor.run {
                     self.device = response.data
                     self.loadingStatus = false
+                    self.checkIsOwned()
                 }
             } catch {
                 print("请求失败：", error.localizedDescription)
                 loadingStatus = false
             }
+        }
+    }
+
+    private func checkIsOwned() {
+        do {
+            let ownedItems = try LocalDatabase.shared.fetchOwnedItems()
+            if let currentDocId = device?.documentId {
+                isOwned = ownedItems.contains { $0.documentId == currentDocId }
+            }
+        } catch {
+            print("本地查询失败: \(error.localizedDescription)")
+            isOwned = false
         }
     }
 }
@@ -126,7 +149,7 @@ struct InformationViewDevice: Codable, Identifiable {
         createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt) ?? "暂无"
         updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt) ?? "暂无"
         publishedAt = try container.decodeIfPresent(String.self, forKey: .publishedAt) ?? ""
-        
+
         model = try container.decodeIfPresent(String.self, forKey: .model) ?? "暂无"
         brand = try container.decodeIfPresent(String.self, forKey: .brand) ?? "暂无"
         type = try container.decodeIfPresent([String].self, forKey: .type) ?? []
@@ -151,7 +174,6 @@ struct InformationViewImage: Codable, Identifiable {
     let height: Int
     let url: String
 }
-
 
 #Preview {
     DeviceView()

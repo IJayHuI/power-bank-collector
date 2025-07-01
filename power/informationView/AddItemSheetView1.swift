@@ -1,15 +1,9 @@
-//
-//  AddItemSheetView.swift
-//  power
-//
-//  Created by HUAWEI MateBook X on 2025/6/30.
-//
-
 import SwiftUI
 
 struct AddItemSheetView1: View {
     let device: InformationViewDevice?
     let type: String
+    let showMaintenanceTime: Bool
     
     @Environment(\.dismiss) private var dismiss
     @State private var selectedDate = Date()
@@ -17,10 +11,12 @@ struct AddItemSheetView1: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                DatePicker("选择日期", selection: $selectedDate, displayedComponents: .date)
-                    .datePickerStyle(.graphical)
-                    .padding()
-                
+                if showMaintenanceTime {
+                    DatePicker("选择日期", selection: $selectedDate, displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                        .padding()
+                }
+
                 Spacer()
                 
                 Button(action: {
@@ -30,26 +26,38 @@ struct AddItemSheetView1: View {
                     formatter.dateFormat = "yyyy-MM-dd"
                     let formattedDate = formatter.string(from: selectedDate)
                     
-                    let status = (type == "拥有") ? 1 : 2
-                    
                     do {
+                        let status: Int
+                        
+                        switch type {
+                        case "拥有":
+                            status = 1
+                        case "愿望":
+                            status = 2
+                        case "维护":
+                            status = 3
+                        default:
+                            status = 0
+                        }
+                        
                         try LocalDatabase.shared.insertItem(
                             deviceId: device.id,
-                            documentId: device.documentId,  // 这里传入 documentId
+                            documentId: device.documentId,
                             dateStr: formattedDate,
                             status: status,
                             powerDate: formattedDate,
                             imageUrl: device.thumbnail?.formats.small.url ?? "",
                             name: device.name
                         )
-                        print("✅ 插入成功: \(device.name) | 状态: \(type) | 日期: \(formattedDate)")
+                        
+                        print("操作成功: \(type) - \(device.name) - 日期: \(formattedDate)")
                     } catch {
-                        print("❌ 插入失败: \(error.localizedDescription)")
+                        print("数据库插入失败: \(error.localizedDescription)")
                     }
                     
                     dismiss()
                 }) {
-                    Text("添加")
+                    Text("确认")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
@@ -59,7 +67,7 @@ struct AddItemSheetView1: View {
                 }
             }
             .padding()
-            .navigationTitle("添加为「\(type)」")
+            .navigationTitle("\(type)操作")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

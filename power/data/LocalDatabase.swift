@@ -1,5 +1,5 @@
 //
-//  table.swift
+//  LocalDatabase.swift
 //  power
 //
 //  Created by HUAWEI MateBook X on 2025/6/30.
@@ -117,6 +117,46 @@ class LocalDatabase {
                 image: row[image],
                 name: row[name],
                 documentId: row[documentId]
+            )
+            result.append(item)
+        }
+        return result
+    }
+    func updatePowerDate(documentId: String, newDate: String) throws {
+        guard let db = db else {
+            throw NSError(domain: "数据库未初始化", code: 0)
+        }
+
+        let target = items.filter(self.documentId == documentId && powerstatus == 1)
+        try db.run(target.update(powerdate <- newDate))
+    }
+    
+    func countItems(withStatus status: Int) -> Int {
+        guard let db = db else { return 0 }
+        do {
+            let query = items.filter(powerstatus == status)
+            return try db.scalar(query.count)
+        } catch {
+            print("统计失败: \(error.localizedDescription)")
+            return 0
+        }
+    }
+    
+    
+    func fetchMaintenanceItems() throws -> [MaintenanceItem] {
+        guard let db = db else {
+            throw NSError(domain: "数据库未初始化", code: 0)
+        }
+        var result: [MaintenanceItem] = []
+        let query = items.filter(powerstatus == 3)  // powerstatus = 3 表示需维护
+        for row in try db.prepare(query) {
+            let item = MaintenanceItem(
+                id: row[id],
+                itemid: row[itemid],
+                documentId: row[documentId],
+                name: row[name],
+                date: row[date],
+                image: row[image]
             )
             result.append(item)
         }

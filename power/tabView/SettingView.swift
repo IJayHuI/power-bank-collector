@@ -1,13 +1,10 @@
-//
-//  SettingsView.swift
-//  power
-//
-//  Created by 胡杰 on 2025/6/18.
-//
-
 import SwiftUI
 
 struct SettingView: View {
+    @State private var ownCount: Int = 0
+    @State private var wishCount: Int = 0
+    @State private var maintenanceCount: Int = 0
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -20,7 +17,6 @@ struct SettingView: View {
                 }
                 .padding(.horizontal)
 
-                // 封面区域
                 // 顶部数据统计卡片
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color.gray.opacity(0.1))
@@ -31,9 +27,9 @@ struct SettingView: View {
                                 .font(.headline)
 
                             HStack(spacing: 20) {
-                                statBox(icon: "checkmark.seal.fill", title: "已拥有", count: 3, color: .green)
-                                statBox(icon: "star.fill", title: "愿望", count: 3, color: .orange)
-                                statBox(icon: "wrench.and.screwdriver.fill", title: "需维护", count: 3, color: .red)
+                                statBox(icon: "checkmark.seal.fill", title: "已拥有", count: ownCount, color: .green)
+                                statBox(icon: "star.fill", title: "愿望", count: wishCount, color: .orange)
+                                statBox(icon: "wrench.and.screwdriver.fill", title: "需维护", count: maintenanceCount, color: .red)
                             }
                         }
                         .padding()
@@ -61,7 +57,17 @@ struct SettingView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .onAppear {
+                loadCounts()
+            }
         }
+    }
+
+    // 统计数据加载
+    func loadCounts() {
+        ownCount = LocalDatabase.shared.countItems(withStatus: 1)
+        wishCount = LocalDatabase.shared.countItems(withStatus: 2)
+        maintenanceCount = LocalDatabase.shared.countItems(withStatus: 3) // 同已拥有
     }
 
     func settingButton(title: String, icon: String) -> some View {
@@ -87,6 +93,7 @@ struct SettingView: View {
     }
 }
 
+// 单个统计框
 func statBox(icon: String, title: String, count: Int, color: Color) -> some View {
     VStack(spacing: 8) {
         Image(systemName: icon)
