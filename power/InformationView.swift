@@ -24,8 +24,10 @@ struct InformationView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
-                    InformationBanner(inputDevice: device)
-                    InfomationContent(inputDevice: device)
+                    if let device = device {
+                        InformationBanner(inputDevice: device, isOwned: $isOwned) // ✅ 传入绑定
+                        InfomationContent(inputDevice: device)
+                    }
                 }
                 .padding(.top, 16)
             }
@@ -64,7 +66,10 @@ struct InformationView: View {
                 AddItemSheetView1(
                     device: device,
                     type: sheetType.value,
-                    showMaintenanceTime: sheetType.value == "拥有" || sheetType.value == "维护"
+                    showMaintenanceTime: sheetType.value == "拥有" || sheetType.value == "维护",
+                    onSuccess: {
+                        checkIsOwned() // ✅ 点确认后刷新 isOwned
+                    }
                 )
             }
             .navigationTitle(device?.name ?? "设备详情")
@@ -99,14 +104,21 @@ struct InformationView: View {
     }
 
     private func checkIsOwned() {
-        do {
-            let ownedItems = try LocalDatabase.shared.fetchOwnedItems()
-            if let currentDocId = device?.documentId {
-                isOwned = ownedItems.contains { $0.documentId == currentDocId }
+        Task {
+            do {
+                let ownedItems = try LocalDatabase.shared.fetchOwnedItems()
+                if let currentDocId = device?.documentId {
+                    let isMatch = ownedItems.contains { $0.documentId == currentDocId }
+                    await MainActor.run {
+                        isOwned = isMatch
+                    }
+                }
+            } catch {
+                print("本地查询失败: \(error.localizedDescription)")
+                await MainActor.run {
+                    isOwned = false
+                }
             }
-        } catch {
-            print("本地查询失败: \(error.localizedDescription)")
-            isOwned = false
         }
     }
 }
@@ -117,7 +129,7 @@ struct InformationViewResponse: Codable {
 
 struct InformationViewDevice: Codable, Identifiable {
     let id: Int
-    let documentId: String
+    let documentId: String?
     let name: String
     let createdAt: String
     let updatedAt: String
@@ -144,7 +156,7 @@ struct InformationViewDevice: Codable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         id = try container.decode(Int.self, forKey: .id)
-        documentId = try container.decodeIfPresent(String.self, forKey: .documentId) ?? ""
+        documentId = try container.decodeIfPresent(String.self, forKey: .documentId)
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? "暂无"
         createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt) ?? "暂无"
         updatedAt = try container.decodeIfPresent(String.self, forKey: .updatedAt) ?? "暂无"

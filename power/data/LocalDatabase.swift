@@ -181,4 +181,36 @@ class LocalDatabase {
             return 0
         }
     }
+    
+    func isDeviceOwned(documentId: String) -> Bool {
+        guard let db = db else { return false }
+        
+        let query = items.filter(self.documentId == documentId && powerstatus == 1)
+        
+        do {
+            return try db.pluck(query) != nil
+        } catch {
+            print("查询失败: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    func printAllItems() {
+        guard let db = db else {
+            print("数据库未初始化")
+            return
+        }
+        do {
+            print("----- 数据库所有 items -----")
+            for row in try db.prepare(items) {
+                let docId = row[documentId]
+                let status = row[powerstatus]
+                let nameValue = row[name]
+                print("id: \(row[id]), documentId: '\(docId)', powerstatus: \(status), name: \(nameValue)")
+            }
+            print("-------------------------")
+        } catch {
+            print("打印所有items失败: \(error.localizedDescription)")
+        }
+    }
 }
