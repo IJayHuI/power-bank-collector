@@ -38,7 +38,19 @@ struct MaintenanceView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 loadData()
-            }
+            }.toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // 操作
+                    }) {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.accentColor)
+                            .padding(8)
+                            .background(Color.clear)
+                            .clipShape(Circle())
+                    }
+                }}
         }
     }
 
@@ -81,7 +93,7 @@ struct MaintenanceItemRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(.headline)
-                    Text("需维护 - 添加日期: \(item.date)")
+                    Text("\(isDueForMaintenance ? "需维护" : "无需维护") - 添加日期: \(item.date)")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -92,6 +104,17 @@ struct MaintenanceItemRow: View {
             .cornerRadius(12)
             .padding(.horizontal)
         }
+    }
+
+    var isDueForMaintenance: Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let lastPowerDate = formatter.date(from: item.date) else {
+            return false
+        }
+
+        let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: Date())!
+        return lastPowerDate <= threeMonthsAgo
     }
 
     private var deviceImage: some View {

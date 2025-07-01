@@ -162,4 +162,23 @@ class LocalDatabase {
         }
         return result
     }
+    
+    func countDueMaintenanceItems() -> Int {
+        guard let db = db else { return 0 }
+        
+        do {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            
+            let now = Date()
+            let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: now)!
+            let cutoffDateStr = formatter.string(from: threeMonthsAgo)
+            
+            let query = items.filter(powerstatus == 3 && powerdate <= cutoffDateStr)
+            return try db.scalar(query.count)
+        } catch {
+            print("统计需维护项失败: \(error.localizedDescription)")
+            return 0
+        }
+    }
 }

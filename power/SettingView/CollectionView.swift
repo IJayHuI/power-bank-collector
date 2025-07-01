@@ -9,9 +9,9 @@ import SwiftUI
 
 struct CollectionView: View {
     let items = [
-        "Anker GaN 65W",
-        "Baseus 100W充电宝",
-        "绿联 140W充电器"
+        "A",
+        "B",
+        "C"
     ]
     
     var body: some View {

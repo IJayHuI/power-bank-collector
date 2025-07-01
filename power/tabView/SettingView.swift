@@ -16,6 +16,7 @@ struct SettingView: View {
                     Spacer()
                 }
                 .padding(.horizontal)
+                .padding(.top, 45)
 
                 // 顶部数据统计卡片
                 RoundedRectangle(cornerRadius: 20)
@@ -61,13 +62,14 @@ struct SettingView: View {
                 loadCounts()
             }
         }
+        
     }
 
     // 统计数据加载
     func loadCounts() {
         ownCount = LocalDatabase.shared.countItems(withStatus: 1)
         wishCount = LocalDatabase.shared.countItems(withStatus: 2)
-        maintenanceCount = LocalDatabase.shared.countItems(withStatus: 3) // 同已拥有
+        maintenanceCount = LocalDatabase.shared.countDueMaintenanceItems() // 同已拥有
     }
 
     func settingButton(title: String, icon: String) -> some View {

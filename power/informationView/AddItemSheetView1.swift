@@ -28,7 +28,6 @@ struct AddItemSheetView1: View {
                     
                     do {
                         let status: Int
-                        
                         switch type {
                         case "拥有":
                             status = 1
@@ -67,7 +66,7 @@ struct AddItemSheetView1: View {
                 }
             }
             .padding()
-            .navigationTitle("\(type)操作")
+            .navigationTitle("添加为\(type)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

@@ -38,7 +38,19 @@ struct WishView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 loadData()
-            }
+            }.toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // 操作
+                    }) {
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.accentColor)
+                            .padding(8)
+                            .background(Color.clear)
+                            .clipShape(Circle())
+                    }
+                }}
         }
     }
 
