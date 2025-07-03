@@ -9,9 +9,11 @@ import SwiftUI
 
 struct CollectionView: View {
     let items = [
-        "A",
-        "B",
-        "C"
+        "低碳生活，从绿色充电开始",
+        "避免手机过夜充电的5个理由",
+        "快充≠伤电池？全面解析充电误区",
+        "国家电网推荐的充电安全指南",
+        "支持UFCS的意义：推动统一快充标准"
     ]
     
     var body: some View {
@@ -21,14 +23,20 @@ struct CollectionView: View {
                     LazyVStack(spacing: 12) {
                         ForEach(items, id: \.self) { item in
                             HStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 60, height: 60)
-
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color.green.opacity(0.15))
+                                    Image(systemName: "leaf.circle.fill") // 或"bolt.fill" "book.fill"等
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.green)
+                                        .padding(12)
+                                }
+                                .frame(width: 60, height: 60)
                                 VStack(alignment: .leading) {
                                     Text(item)
                                         .font(.headline)
-                                    Text("点击查看详情")
+                                    Text("查看文章内容")
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                 }
