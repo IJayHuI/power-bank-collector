@@ -75,10 +75,12 @@ struct SettingView: View {
     func settingButton(title: String, icon: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .foregroundColor(.blue)
+                .foregroundColor(.primary)
                 .font(.system(size: 20))
+                
 
             Text(title)
+                .foregroundColor(.primary)
                 .font(.system(size: 17, weight: .medium))
 
             Spacer()
