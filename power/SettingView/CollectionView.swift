@@ -52,7 +52,7 @@ struct CollectionView: View {
 
                 Spacer()
             }
-            .navigationTitle("我的收藏")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
