@@ -46,7 +46,7 @@ struct SettingView: View {
                         settingButton(title: "拥有", icon: "checkmark.seal")
                     }
                     NavigationLink(destination: CollectionView()) {
-                        settingButton(title: "收藏", icon: "heart")
+                        settingButton(title: "文章", icon: "text.book.closed")
                     }
                     NavigationLink(destination: WishView()) {
                         settingButton(title: "愿望", icon: "star")
