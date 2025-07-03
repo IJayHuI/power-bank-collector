@@ -184,6 +184,7 @@ struct DeviceViewDevice: Codable, Identifiable {
     let id: Int
     let documentId: String
     let name: String
+    let group: String
     let thumbnail: DeviceViewThumbnail?
 }
 

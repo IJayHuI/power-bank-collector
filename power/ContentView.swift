@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-
 struct ContentView: View {
     @State private var searchText = ""
-
+    @State private var isSearching = false
+    
     var body: some View {
         TabView {
             Tab("设备", systemImage: "iphone.gen3") {
@@ -23,8 +23,18 @@ struct ContentView: View {
                 SettingView()
             }
             Tab("搜索", systemImage: "magnifyingglass", role: .search) {
-                SearchView()
-                    .searchable(text: $searchText, prompt: "搜索")
+                NavigationStack {
+                    VStack {
+                        SearchView()
+                    }
+                        .searchable(text: $searchText, prompt: "搜索")
+                        .onSubmit(of: .search) {
+                            isSearching = true
+                        }
+                        .navigationDestination(isPresented: $isSearching) {
+                            SearchResult(keyword: searchText)
+                        }
+                }
             }
         }
         .tabViewStyle(.sidebarAdaptable)

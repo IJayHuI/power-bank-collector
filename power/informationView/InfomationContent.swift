@@ -121,42 +121,26 @@ struct FeatureDetailSheet: View {
     let feature: String
 
     var body: some View {
-        VStack(spacing: 0) {
-            Spacer().frame(height: 16)
-
-            VStack(alignment: .leading, spacing: 12) {
+        ScrollView{
+            VStack(alignment: .leading) {
                 HStack {
+                    Text(feature)
+                        .font(.title)
+                        .bold()
                     Image(systemName: "bolt.horizontal.fill")
                         .font(.system(size: 30))
                         .foregroundColor(.indigo)
-                    Spacer()
                 }
-
-                Text(feature)
-                    .font(.title2)
-                    .bold()
-
                 Text("协议")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-
+                
                 Text(featureDescription(for: feature))
                     .font(.body)
                     .lineSpacing(6)
-
-                Spacer()
             }
             .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(Color(uiColor: .systemBackground))
-            )
-            .padding(.horizontal)
-            .padding(.top, 8)
-
-            Spacer()
         }
-        .background(Color.black.opacity(0.01))
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }

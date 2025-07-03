@@ -9,14 +9,11 @@ import SwiftUI
 
 struct SearchView: View {
     var body: some View {
-        NavigationView {
-            VStack {
-                Image(systemName: "magnifyingglass")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("搜索")
-            }
-            .navigationTitle("搜索")
+        VStack {
+            Image(systemName: "magnifyingglass")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("搜索")
         }
     }
 }
