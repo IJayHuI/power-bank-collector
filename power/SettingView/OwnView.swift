@@ -84,6 +84,7 @@ struct OwnItemRow: View {
             id: Int(item.itemid),
             documentId: item.documentId,
             name: item.name,
+            group: "0",
             thumbnail: nil
         ))) {
             HStack {
