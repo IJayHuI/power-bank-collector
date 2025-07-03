@@ -44,7 +44,7 @@ struct InfomationContent: View {
             }
             VStack{
                 if let param = inputDevice?.type,!param.isEmpty {
-                    Text("类型")
+                    Text("特点")
                         .font(.title2)
                         .bold()
                         .frame(maxWidth: .infinity, alignment: .leading)

@@ -31,7 +31,6 @@ struct InformationView: View {
                 }
                 .padding(.top, 16)
             }
-            .toolbar(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
