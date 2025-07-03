@@ -87,14 +87,15 @@ struct DeviceView: View {
 struct DeviceCard: View {
     let device: DeviceViewDevice
     let isOwned: Bool
-    
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color.gray.opacity(0.05))
-                    
+
                     if let firstImage = device.thumbnail,
                        let url = URL(string: "https://strapi.jayhu.site" + firstImage.formats.small.url) {
                         AsyncImage(url: url) { phase in
@@ -119,7 +120,7 @@ struct DeviceCard: View {
                 .frame(height: 140)
                 .clipped()
                 .cornerRadius(20)
-                
+
                 Text(device.name)
                     .font(.headline)
                     .lineLimit(2)
@@ -128,28 +129,29 @@ struct DeviceCard: View {
                     .padding([.top, .horizontal], 8)
                     .padding(.bottom, 12)
             }
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(25)
-            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: 25)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
             )
-            
+
             if isOwned {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.seal.fill")
-                        .foregroundColor(Color.green)
+                        .foregroundColor(.green)
                 }
                 .padding(6)
                 .background(.ultraThinMaterial)
                 .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.1), radius: 2, x: 1, y: 1)
+                .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 1, y: 1)
                 .padding(8)
                 .transition(.opacity)
             }
         }
     }
+
     
     private var placeholderImage: some View {
         Image(systemName: "iphone")
