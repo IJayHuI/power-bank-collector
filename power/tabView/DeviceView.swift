@@ -15,7 +15,6 @@ struct DeviceView: View {
     @State private var errorMessage: String?
     @Namespace private var animationNamespace
     
-    
     // 定义两列网格布局
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -23,78 +22,79 @@ struct DeviceView: View {
     ]
     
     var body: some View {
-            NavigationStack {
+        NavigationStack {
+            ScrollView {
                 if loadingStatus {
                     ProgressView()
                 } else if let error = errorMessage {
                     Text("错误：\(error)")
                 } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(devices) { item in
-                                NavigationLink(destination: InformationView(inputDevice: item)) {
-                                    DeviceCard(device: item, isOwned: ownedDocumentIds.contains(item.documentId))
-                                }
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(devices) { item in
+                            NavigationLink(destination: InformationView(inputDevice: item)) {
+                                DeviceCard(device: item, isOwned: ownedDocumentIds.contains(item.documentId))
                             }
                         }
-                        .padding()
-                        .navigationTitle("设备")
                     }
+                    .padding()
                 }
             }
-            .onAppear {
-                Task {
-                    await getData()
-                    fetchOwnedIds()
-                }
-            }
-            .refreshable {
+            
+            .navigationTitle("设备")
+        }
+        .onAppear {
+            Task {
                 await getData()
                 fetchOwnedIds()
             }
         }
-
-        private func fetchOwnedIds() {
+        .refreshable {
+            await getData()
+            fetchOwnedIds()
+        }
+    }
+    
+    private func fetchOwnedIds() {
+        do {
+            let ownedItems = try LocalDatabase.shared.fetchOwnedItems()
+            let ownedIds = Set(ownedItems.map { $0.documentId })
+            ownedDocumentIds = ownedIds
+        } catch {
+            print("获取已拥有设备失败：\(error.localizedDescription)")
+            ownedDocumentIds = []
+        }
+    }
+    
+    private func getData() async {
+        loadingStatus = true
+        errorMessage = nil
+        Task {
             do {
-                let ownedItems = try LocalDatabase.shared.fetchOwnedItems()
-                let ownedIds = Set(ownedItems.map { $0.documentId })
-                ownedDocumentIds = ownedIds
-            } catch {
-                print("获取已拥有设备失败：\(error.localizedDescription)")
-                ownedDocumentIds = []
-            }
-        }
-
-        private func getData() async {
-            loadingStatus = true
-            errorMessage = nil
-            Task {
-                do {
-                    let response: DeviceViewResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors?populate=*", responseType: DeviceViewResponse.self)
-                    await MainActor.run {
-                        self.devices = response.data
-                    }
-                    self.loadingStatus = false
-                } catch {
-                    print("请求失败：", error.localizedDescription)
-                    self.loadingStatus = false
+                let response: DeviceViewResponse = try await HTTPRequest.shared.get(endpoint: "/power-collectors?populate=*", responseType: DeviceViewResponse.self)
+                await MainActor.run {
+                    self.devices = response.data
                 }
+                self.loadingStatus = false
+            } catch {
+                print("请求失败：", error.localizedDescription)
+                self.loadingStatus = false
             }
         }
+    }
 }
 
 //MARK: 设备卡片组件
 struct DeviceCard: View {
     let device: DeviceViewDevice
     let isOwned: Bool
-
+    
     var body: some View {
-        ZStack(alignment: .topTrailing) { 
+        ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color.gray.opacity(0.05))
-
+                    
                     if let firstImage = device.thumbnail,
                        let url = URL(string: "https://strapi.jayhu.site" + firstImage.formats.small.url) {
                         AsyncImage(url: url) { phase in
@@ -119,7 +119,7 @@ struct DeviceCard: View {
                 .frame(height: 140)
                 .clipped()
                 .cornerRadius(20)
-
+                
                 Text(device.name)
                     .font(.headline)
                     .lineLimit(2)
@@ -137,20 +137,20 @@ struct DeviceCard: View {
             )
             
             if isOwned {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(Color.green)
-                    }
-                    .padding(6)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Capsule())
-                    .shadow(color: .black.opacity(0.1), radius: 2, x: 1, y: 1)
-                    .padding(8)
-                    .transition(.opacity)
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(Color.green)
                 }
+                .padding(6)
+                .background(.ultraThinMaterial)
+                .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.1), radius: 2, x: 1, y: 1)
+                .padding(8)
+                .transition(.opacity)
+            }
         }
     }
-
+    
     private var placeholderImage: some View {
         Image(systemName: "iphone")
             .resizable()
@@ -158,7 +158,7 @@ struct DeviceCard: View {
             .frame(width: 50, height: 50)
             .foregroundColor(.blue.opacity(0.6))
     }
-
+    
     private var errorImage: some View {
         VStack {
             Image(systemName: "xmark.circle")
